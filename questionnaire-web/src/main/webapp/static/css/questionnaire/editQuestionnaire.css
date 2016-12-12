@@ -1,0 +1,24 @@
+.div-bg-blue {
+	padding: 30px;
+	margin: 30px;
+	/* color: #41c4dd; */
+    background-color: rgba(65,196,221,0.15);
+}
+
+.div-bg-green {
+	padding: 30px;
+	margin: 30px;
+    background-color: #ccf8ca;
+}
+
+.div-bg-red {
+	padding: 30px;
+	margin: 30px;
+    background-color: #f9a9a9;
+}
+
+.div-question-content {
+	padding: 30px;
+	margin: 30px;
+    background-color: #fbdede;
+}

@@ -1,0 +1,135 @@
+<link href="${rc.contextPath}/static/css/questionnaire/questionnaireDetail.css" rel="stylesheet">
+#parse("layouts/header.html")
+
+<!-- questionnaire edit -->
+<div class="container-fluid div-bg-blue">
+	<div class="row">
+		<div class="col-sm-2 col-md-offset-1">
+			<h3>问卷信息</h3>
+			<br></div>
+	</div>
+	<form class="form-horizontal" role="form" method="post" action="${rc.contextPath}/private/questionnaire/edit">
+		<input type="hidden" name="id" value="$!{questionnaire.id}">
+		<div class="form-group">
+			<div class="row">
+				<div class="col-sm-1 col-md-offset-2 questionnaire-title-label">问卷标题</div>
+				<div class="col-sm-7">
+					$!{questionnaire.title}
+					<br><br></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-1 col-md-offset-2 questionnaire-description-label">问卷描述</div>
+				<div class="col-sm-7">
+					$!{questionnaire.description}
+					<br><br></div>
+			</div>
+			<div class="row">
+				<div class="col-sm-1 col-md-offset-2">
+				#if(${questionnaire.visible})
+					<p>公开</p>
+				#else
+					<p>私密</p>
+				#end
+				</div>
+			</div>
+			<div class="row">
+			<!-- Link to Edit and Delete Question -->
+			#if(${user.id} == ${questionnaire.user_id})
+				<div class="col-sm-1 col-md-offset-11">
+					<a class="fa fa-edit edit-question" href="${rc.contextPath}/private/questionnaire/edit/${questionnaire.id}" title="编辑此问题"></a>&nbsp
+					<a class="fa fa-trash-o delete-question" data-toggle="modal" href="#modal-questionnaire-deletion" title="删除此问题"></a>
+				</div>
+			#end
+			</div>
+		</div>
+	</form>
+</div>
+
+<!-- choice-question list -->
+<div class="container-fluid div-bg-green">
+	<div class="row">
+		<div class="col-sm-2 col-md-offset-1">
+			<h3>选择题</h3>
+			<br></div>
+	</div>
+	
+	<!-- question list -->
+	<div class="question-list">
+		#foreach(${question} in ${choiceQuestions})
+		<div class="div-question-content" data-id="${question.id}" 
+				data-length="${question.options.size()}" data-title="${question.title}" 
+				data-questionnaireid="${question.questionnaireId}" data-type="${question.type}">
+			<!-- question title -->
+			<div class="row question-title">
+				<div class="col-sm-10 col-md-offset-2">
+					<h4>${foreach.count}. $!{question.title}</h4>
+				</div>
+			</div>
+			<!-- option list -->
+			<div class="option-list">
+				#foreach(${option} in ${question.options})
+					<div class="row option-item option-item-${foreach.count}" 
+							data-id="${option.id}" data-title="${option.title}">
+						<div class="col-sm-10 col-md-offset-2 option-title">&nbsp ${option.title}</div>
+					</div>
+				#end
+			</div>
+		</div>
+		#end
+	</div>
+</div>
+
+<!-- essay-question list -->
+<div class="container-fluid div-bg-red">
+	<div class="row">
+		<div class="col-sm-2 col-md-offset-1">
+			<h3>问答题</h3>
+			<br></div>
+	</div>
+	
+	<!-- question list -->
+	<div class="question-list">
+		#foreach(${question} in ${essayQuestions})
+		<div class="div-question-content" data-id="${question.id}" data-title="${question.title}" 
+					data-questionnaireid="${question.questionnaireId}" data-type="${question.type}">
+			<!-- question title -->
+			<div class="row question-title">
+				<div class="col-sm-10 col-md-offset-2">
+					<h4>${foreach.count}. $!{question.title}</h4>
+				</div>
+			</div>
+		</div>
+		#end
+	</div>
+</div>
+
+<!-- essay-question deletion modal -->
+<div class="modal fade" id="modal-questionnaire-deletion" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<form action="${rc.contextPath}/private/questionnaire/deletion"
+				method="get" class="form-horizontal" role="form"
+				id="question-deletion">
+				<input type="hidden" name="questionnaireId" value="${questionnaire.id}">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">删除问卷</h4>
+				</div>
+
+				<div class="modal-body">
+					确认删除该问卷？
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="submit" class="btn btn-primary">确认</button>
+				</div>
+			</form>
+		</div>
+		<!-- question deletion modal content -->
+	</div>
+</div>
+<!-- essay-question deletion modal end -->

@@ -1,0 +1,161 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.cuit.questionnaire.persist.questionnaire.QuestionnaireMapper">
+
+	<insert id="save" useGeneratedKeys="true" parameterType="questionnaire"
+			keyProperty="id">
+		INSERT INTO 
+			qn_questionnaire (
+				title,
+				description,
+				visible,
+				user_id
+			) 
+		VALUES (
+			#{title},
+			#{description},
+			#{visible},
+			#{user.id}
+			)
+	</insert>
+	
+	<update id="update" parameterType="questionnaire">
+		UPDATE
+			qn_questionnaire
+			<set>
+				title = #{title}, 
+				description = #{description},
+				publish = #{publish},
+				visible = #{visible},
+				user_id = #{user.id},
+				usages = #{usages}
+			</set>
+		WHERE
+			id = #{id}
+	</update>
+	
+	<delete id="deleteById" parameterType="Long">
+		DELETE 
+			qn_questionnaire, qn_question, qn_option
+        FROM	
+			qn_questionnaire
+		LEFT OUTER JOIN
+			qn_question ON qn_question.questionnaire_id = qn_questionnaire.id
+		LEFT OUTER JOIN 
+			qn_option ON qn_question.id = qn_option.question_id
+		WHERE 
+			qn_questionnaire.id = #{questionnaireId}
+	</delete>
+	
+	<select id="findById" resultMap="questionnaireMap">
+		SELECT 
+			q.id, 
+			q.title,
+			q.description,
+			q.create_date AS createDate,
+			q.publish,
+			q.visible,
+			q.usages, 
+			ur.id AS userId,
+			ur.name AS userName,
+			ur.email AS userEmail,
+			ur.passwd AS userPasswd,
+			ur.salt AS userSalt,
+			qs.id AS questionId, 
+			qs.title AS questionTitle,
+			qs.create_date AS questionCreateDate,
+			qs.type AS questionType,
+			qs.questionnaire_id,
+			op.id AS optionId,
+			op.title AS optionTitle,
+			op.create_date AS optionCreateDate,
+			op.question_id
+		FROM (
+			SELECT
+				*
+			FROM
+				qn_questionnaire
+			WHERE
+				id = #{id}
+		) AS q
+		LEFT OUTER JOIN
+			ur_user ur ON ur.id = q.user_id
+		LEFT OUTER JOIN
+			qn_question qs ON q.id = qs.questionnaire_id
+		LEFT OUTER JOIN 
+			qn_option op ON op.question_id = qs.id
+	</select>
+	
+	<select id="findTopPublic" resultType="questionnaire">
+		SELECT
+			*
+		FROM
+			qn_questionnaire q
+		WHERE
+			q.visible = 1
+		ORDER BY
+			q.usages DESC, q.id DESC
+		LIMIT
+			#{pageInfo.startRow}, #{pageInfo.pageSize}
+	</select>
+	
+	<select id="findByUserId" resultType="questionnaire">
+		SELECT
+			* 
+		FROM
+			qn_questionnaire
+		WHERE
+			user_id = #{userId}
+		LIMIT
+			#{pageInfo.startRow}, #{pageInfo.pageSize}
+	</select>
+	
+	<select id="countAllPublic" resultType="long">
+		SELECT
+			count(id)
+		FROM
+			qn_questionnaire
+		WHERE
+			visible = 1
+	</select>
+	
+	<select id="countAllPrivateByUserId" parameterType="Long" resultType="long">
+		SELECT 
+			count(id)
+		FROM
+			qn_questionnaire
+		WHERE
+			user_id = #{userId}
+	</select>
+
+	<resultMap type="questionnaire" id="questionnaireMap">
+		<id column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="description" property="description"/>
+		<result column="createDate" property="createDate"/>
+		<result column="publish" property="publish"/>
+		<result column="visible" property="visible"/>
+		<result column="usages" property="usages"/>
+		<association property="user" javaType="user">
+			<id column="userId" property="id"/>
+			<result column="userName" property="name"/>
+			<result column="userEmail" property="email"/>
+			<result column="userPasswd" property="passwd"/>
+			<result column="userSalt" property="salt"/>
+		</association>
+		<collection property="questions" ofType="question">
+			<id column="questionId" property="id"/>
+			<result column="questionTitle" property="title"/>
+			<result column="questionCreateDate" property="createDate"/>
+			<result column="questionType" property="type"/>
+			<result column="questionnaire_id" property="questionnaireId"/>
+			<collection property="options" ofType="option">
+				<id column="optionId" property="id"/>
+				<result column="optionTitle" property="title"/>
+				<result column="optionCreateDate" property="createDate"/>
+				<result column="question_id" property="questionId"/>
+			</collection>
+		</collection>
+	</resultMap>
+</mapper>

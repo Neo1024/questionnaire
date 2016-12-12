@@ -1,0 +1,446 @@
+<link href="${rc.contextPath}/static/css/questionnaire/editQuestionnaire.css" rel="stylesheet">
+<script src="${rc.contextPath}/static/js/questionnaire/editQuestionnaire.js" type="text/javascript"></script>
+#parse("layouts/header.html")
+
+<!-- questionnaire edit -->
+<div class="container-fluid div-bg-blue">
+	<div class="row">
+		<div class="col-sm-2 col-md-offset-1">
+			<h3>问卷信息</h3>
+			<br></div>
+	</div>
+	<form class="form-horizontal" role="form" method="post" action="${rc.contextPath}/private/questionnaire/edit">
+		<input type="hidden" name="id" value="$!{questionnaire.id}">
+		<div class="form-group">
+			<div class="row">
+				<label class="col-sm-2 control-label col-md-offset-1">问卷标题</label>
+				<div class="col-sm-7">
+					<input class="form-control" type="text" name="title" value="$!{questionnaire.title}">
+					<br></div>
+			</div>
+			<div class="row">
+				<label class="col-sm-2 control-label col-md-offset-1">问卷描述</label>
+				<div class="col-sm-7">
+					<input class="form-control" type="text" name="description" value="$!{questionnaire.description}">
+					<br></div>
+			</div>
+			<div class="row">
+				<div class="radio col-md-offset-3">
+				#if(${questionnaire.visible})
+					<label>
+						<input type="radio" name="visible"
+						id="radio-public" value="true" checked>公开</label>
+					<label>
+						<input type="radio" name="visible"
+						id="radio-private" value="false">私密</label>
+				#else
+					<label>
+						<input type="radio" name="visible"
+						id="radio-public" value="true">公开</label>
+					<label>
+						<input type="radio" name="visible"
+						id="radio-private" value="false" checked>私密</label>
+				#end
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-2 col-md-offset-6">
+					<button type="submit" class="btn btn-primary btn-lg">提交修改</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+<!-- choice-question list -->
+<div class="container-fluid div-bg-green">
+	<div class="row">
+		<div class="col-sm-2 col-md-offset-1">
+			<h3>选择题</h3>
+			<br></div>
+	</div>
+	<div class="row">
+		<div class="col-sm-2 col-md-offset-1">
+			<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modal-question-creation">新建问题</button>
+			<br><br><br></div>
+	</div>
+	
+	<!-- question list -->
+	<div class="question-list">
+		#foreach(${question} in ${choiceQuestions})
+		<div class="div-question-content" data-id="${question.id}" 
+				data-length="${question.options.size()}" data-title="${question.title}" 
+				data-questionnaireid="${question.questionnaireId}" data-type="${question.type}">
+			<!-- question title -->
+			<div class="row question-title">
+				<div class="col-sm-10 col-md-offset-2">
+					<h4>${foreach.count}. $!{question.title}</h4>
+				</div>
+			</div>
+			<!-- option list -->
+			<div class="option-list">
+				#foreach(${option} in ${question.options})
+					<div class="row option-item option-item-${foreach.count}" 
+							data-id="${option.id}" data-title="${option.title}">
+						<div class="col-sm-10 col-md-offset-2 option-title">&nbsp ${option.title}</div>
+					</div>
+				#end
+			</div>
+			<!-- Link to Edit and Delete Question -->
+			<div class="row question-title">
+				<div class="col-sm-1 col-md-offset-11">
+					<a class="fa fa-edit edit-question" data-toggle="modal" href="#modal-question-edition" title="编辑此问题"></a>&nbsp
+					<a class="fa fa-trash-o delete-question" data-toggle="modal" href="#modal-question-deletion" title="删除此问题"></a>
+				</div>
+			</div>
+		</div>
+		#end
+	</div>
+</div>
+
+<!-- essay-question list -->
+<div class="container-fluid div-bg-red">
+	<div class="row">
+		<div class="col-sm-2 col-md-offset-1">
+			<h3>问答题</h3>
+			<br></div>
+	</div>
+	<div class="row">
+		<div class="col-sm-2 col-md-offset-1">
+			<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modal-essay-question-creation">新建问题</button>
+			<br><br><br></div>
+	</div>
+	
+	<!-- question list -->
+	<div class="question-list">
+		#foreach(${question} in ${essayQuestions})
+		<div class="div-question-content" data-id="${question.id}" data-title="${question.title}" 
+					data-questionnaireid="${question.questionnaireId}" data-type="${question.type}">
+			<!-- question title -->
+			<div class="row question-title">
+				<div class="col-sm-10 col-md-offset-2">
+					<h4>${foreach.count}. $!{question.title}</h4>
+				</div>
+			</div>
+			<!-- Link to Edit and Delete Question -->
+			<div class="row question-title">
+				<div class="col-sm-1 col-md-offset-11">
+					<a class="fa fa-edit edit-question" data-toggle="modal" href="#modal-essay-question-edition" title="编辑此问题"></a>&nbsp
+					<a class="fa fa-trash-o delete-question" data-toggle="modal" href="#modal-essay-question-deletion" title="删除此问题"></a>
+				</div>
+			</div>
+		</div>
+		#end
+	</div>
+</div>
+
+<!-- choice-question creation modal -->
+<div class="modal fade" id="modal-question-creation" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<form action="${rc.contextPath}/question/creation"
+				method="post" class="form-horizontal" role="form"
+				id="question-creation">
+				<input type="hidden" name="questionnaireId" value="${questionnaire.id}">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">添加问题</h4>
+				</div>
+
+				<div class="modal-body">
+					<div id="modal-question-title">
+						<label class="control-label">问题</label>
+						<input
+							class="form-control" type="text" name="title" placeholder="请输入问题内容">
+						<br>
+					</div>
+					<label class="control-label">选项</label>
+					<input class="form-control"
+						type="text" name="options[0].title" placeholder="请输入第一个选项内容(必填)"><br>
+					<input class="form-control"
+						type="text" name="options[1].title" placeholder="请输入第二个选项内容(必填)"><br>
+					<input class="form-control"
+						type="text" name="options[2].title" placeholder="请输入第三个选项内容"><br>
+					<input class="form-control"
+						type="text" name="options[3].title" placeholder="请输入第四个选项内容"><br>
+					<input class="form-control"
+						type="text" name="options[4].title" placeholder="请输入第五个选项内容"><br>
+					<input class="form-control"
+						type="text" name="options[5].title" placeholder="请输入第六个选项内容"><br>
+					<input class="form-control"
+						type="text" name="options[6].title" placeholder="请输入第七个选项内容"><br>
+					<input class="form-control"
+						type="text" name="options[7].title" placeholder="请输入第八个选项内容"><br>
+					<label>
+						<input type="radio" name="type"
+						id="radio-single" value="0" checked>单选</label>
+					<label>
+						<input type="radio" name="type"
+						id="radio-multiple" value="1">多选</label>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="submit" class="btn btn-primary"
+						id="btn-create-question">添加</button>
+				</div>
+			</form>
+		</div>
+		<!-- question creation modal content -->
+	</div>
+</div>
+<!-- choice-question creation modal end -->
+
+<!-- choice-question edition modal -->
+<div class="modal fade" id="modal-question-edition" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<form action="${rc.contextPath}/question/edition"
+				method="post" class="form-horizontal" role="form"
+				id="question-edition">
+				<input type="hidden" name="questionnaireId" value="${questionnaire.id}">
+				<input type="hidden" name="id" id="edition-question-id">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">编辑问题</h4>
+				</div>
+
+				<div class="modal-body">
+					<div id="modal-question-title">
+						<label class="control-label">问题</label>
+						<input id="edition-question-title"
+							class="form-control" type="text" name="title" placeholder="请输入问题内容">
+						<br>
+					</div>
+					<label class="control-label">选项</label>
+					
+					<input type="hidden" name="options[0].id" id="edition-option-id-1">
+					<input class="form-control" id="edition-option-title-1" 
+						type="text" name="options[0].title" placeholder="请输入第一个选项内容(必填)"><br>
+						
+					<input type="hidden" name="options[1].id" id="edition-option-id-2">
+					<input class="form-control" id="edition-option-title-2"
+						type="text" name="options[1].title" placeholder="请输入第二个选项内容(必填)"><br>
+						
+					<input type="hidden" name="options[2].id" id="edition-option-id-3">
+					<input class="form-control" id="edition-option-title-3"
+						type="text" name="options[2].title" placeholder="请输入第三个选项内容"><br>
+						
+					<input type="hidden" name="options[3].id" id="edition-option-id-4">
+					<input class="form-control" id="edition-option-title-4"
+						type="text" name="options[3].title" placeholder="请输入第四个选项内容"><br>
+						
+					<input type="hidden" name="options[4].id" id="edition-option-id-5">
+					<input class="form-control" id="edition-option-title-5"
+						type="text" name="options[4].title" placeholder="请输入第五个选项内容"><br>
+						
+					<input type="hidden" name="options[5].id" id="edition-option-id-6">
+					<input class="form-control" id="edition-option-title-6"
+						type="text" name="options[5].title" placeholder="请输入第六个选项内容"><br>
+						
+					<input type="hidden" name="options[6].id" id="edition-option-id-7">
+					<input class="form-control" id="edition-option-title-7"
+						type="text" name="options[6].title" placeholder="请输入第七个选项内容"><br>
+						
+					<input type="hidden" name="options[7].id" id="edition-option-id-8">
+					<input class="form-control" id="edition-option-title-8"
+						type="text" name="options[7].title" placeholder="请输入第八个选项内容"><br>
+
+					<label>
+						<input type="radio" name="type"
+						id="edition-radio-single" value="0">单选</label>
+					<label>
+						<input type="radio" name="type"
+						id="edition-radio-multiple" value="1">多选</label>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="submit" class="btn btn-primary"
+						id="btn-create-question">完成</button>
+				</div>
+			</form>
+		</div>
+		<!-- question edition modal content -->
+	</div>
+</div>
+<!-- choice-question edition modal ends -->
+
+<!-- choice-question deletion modal -->
+<div class="modal fade" id="modal-question-deletion" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<form action="${rc.contextPath}/question/deletion"
+				method="post" class="form-horizontal" role="form"
+				id="question-deletion">
+				<input type="hidden" name="questionnaireId" value="${questionnaire.id}">
+				<input type="hidden" name="questionId" id="deletion-question-id">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">删除问题</h4>
+				</div>
+
+				<div class="modal-body">
+					确认删除该题目？
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="submit" class="btn btn-primary"
+						id="btn-create-question">确认</button>
+				</div>
+			</form>
+		</div>
+		<!-- question deletion modal content -->
+	</div>
+</div>
+<!-- choice-question deletion modal end -->
+
+<!-- essay-question creation modal -->
+<div class="modal fade" id="modal-essay-question-creation" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<form action="${rc.contextPath}/question/creation"
+				method="post" class="form-horizontal" role="form"
+				id="question-creation">
+				<input type="hidden" name="questionnaireId" value="${questionnaire.id}">
+				<input type="hidden" name="type" value="2">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">添加问题</h4>
+				</div>
+
+				<div class="modal-body">
+					<div id="modal-question-title">
+						<label class="control-label">问题</label>
+						<textarea id="edition-question-title"
+							class="form-control" name="title" placeholder="请输入问题内容"></textarea>
+						<br>
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="submit" class="btn btn-primary"
+						id="btn-create-question">添加</button>
+				</div>
+			</form>
+		</div>
+		<!-- question creation modal content -->
+	</div>
+</div>
+<!-- choice-question creation modal end -->
+
+<!-- essay-question edition modal -->
+<div class="modal fade" id="modal-essay-question-edition" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<form action="${rc.contextPath}/question/edition"
+				method="post" class="form-horizontal" role="form"
+				id="essay-question-edition">
+				<input type="hidden" name="questionnaireId" value="${questionnaire.id}">
+				<input type="hidden" name="id" id="edition-question-id">
+				<input type="hidden" name="type" value="3">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">编辑问题</h4>
+				</div>
+
+				<div class="modal-body">
+					<div id="modal-question-title">
+						<label class="control-label">问题</label>
+						<textarea id="edition-question-title"
+							class="form-control" name="title" placeholder="请输入问题内容"></textarea>
+						<br>
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="submit" class="btn btn-primary"
+						id="btn-create-question">完成</button>
+				</div>
+			</form>
+		</div>
+		<!-- question edition modal content -->
+	</div>
+</div>
+<!-- essay-question edition modal ends -->
+
+<!-- essay-question deletion modal -->
+<div class="modal fade" id="modal-essay-question-deletion" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<form action="${rc.contextPath}/question/deletion"
+				method="post" class="form-horizontal" role="form"
+				id="question-deletion">
+				<input type="hidden" name="questionnaireId" value="${questionnaire.id}">
+				<input type="hidden" name="questionId" id="deletion-question-id">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">删除问题</h4>
+				</div>
+
+				<div class="modal-body">
+					确认删除该题目？
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="submit" class="btn btn-primary"
+						id="btn-create-question">确认</button>
+				</div>
+			</form>
+		</div>
+		<!-- question deletion modal content -->
+	</div>
+</div>
+<!-- essay-question deletion modal end -->
+
+<!-- validation -->
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#question-creation").validate({
+			rules : {
+				"title" : "required",
+				"options[0].title" : "required", 
+				"options[1].title" : "required"
+			},
+			messages : {
+				"title" : "请输入问题内容",
+				"options[0].title" : "请输入第一个选项内容", 
+				"options[1].title" : "请输入第二个选项内容"
+			}
+		});
+		$("#question-edition").validate({
+			rules : {
+				"title" : "required",
+				"options[0].title" : "required", 
+				"options[1].title" : "required"
+			},
+			messages : {
+				"title" : "请输入问题内容", 
+				"options[0].title" : "请输入第一个选项内容", 
+				"options[1].title" : "请输入第二个选项内容"
+			}
+		});
+	});
+</script>

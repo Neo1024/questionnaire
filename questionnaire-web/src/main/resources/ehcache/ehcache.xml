@@ -1,0 +1,20 @@
+<!-- Copyright © 2014 - 2015 BatS Technology Co., Ltd. All rights reserved. 
+	成都宝诗科技有限公司 版权所有 http://bats.im , http://ixix.im -->
+
+<ehcache updateCheck="false" name="baseCache">
+
+	<defaultCache maxElementsInMemory="10000" eternal="false"
+		timeToIdleSeconds="120" timeToLiveSeconds="120" overflowToDisk="false"
+		diskPersistent="false" diskExpiryThreadIntervalSeconds="120" />
+
+	<cache name="org.hibernate.cache.spi.UpdateTimestampsCache"
+		maxElementsInMemory="5000" eternal="true" overflowToDisk="true" />
+
+	<cache name="org.hibernate.cache.internal.StandardQueryCache"
+		maxElementsInMemory="10000" eternal="false" timeToLiveSeconds="120"
+		overflowToDisk="true" />
+
+	<cache name="defaultRegion" maxElementsInMemory="2000" eternal="false"
+		timeToIdleSeconds="120" timeToLiveSeconds="120" overflowToDisk="true" />
+
+</ehcache>

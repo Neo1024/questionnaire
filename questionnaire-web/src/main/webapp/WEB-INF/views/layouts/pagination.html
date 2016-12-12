@@ -1,0 +1,81 @@
+<!-- Pagination -->
+<div class="pagination pull-right">
+
+    <!-- Not the First Page -->
+    #if($page.hasPrevious)
+    
+        <li>
+            <a href="?pageNum=1&sortType=$!{sortType}&$!{searchParams}">
+                <i class="fa fa-angle-double-left"></i>
+            </a>
+        </li>
+
+        <li>
+            <a href="?pageNum=$!{page.prePage}&sortType=$!{sortType}&$!{searchParams}">
+                <i class="fa fa-angle-left"></i></a>
+        </li>
+
+    #else
+
+        <!-- Is the First Page -->
+        <li class="disabled">
+            <a href="#">
+                <i class="fa fa-angle-double-left"></i>
+            </a>
+        </li>
+
+        <li class="disabled">
+            <a href="#">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        </li>
+
+    #end
+
+    <!-- All Pages -->
+    #foreach($i in [1..$page.totalPages])
+        #if($i==$page.pageNum)
+            <li class="active">
+                <a href="?pageNum=$!{i}&sortType=$!{sortType}&$!{searchParams}">${i}</a>
+            </li>
+        #else
+            <li>
+                <a href="?pageNum=$!{i}&sortType=$!{sortType}&$!{searchParams}">${i}</a>
+            </li>
+        #end
+    #end
+
+    <!-- Not the Last Page -->
+    #if($page.hasNext)
+    
+        <li>
+            <a href="?pageNum=$!{page.nextPage}&sortType=$!{sortType}&$!{searchParams}">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        </li>
+
+        <li>
+            <a href="?pageNum=$!{page.totalPages}&sortType=$!{sortType}&$!{searchParams}">
+                <i class="fa fa-angle-double-right"></i>
+            </a>
+        </li>
+
+    #else
+
+        <!-- Is the Last Page -->
+        <li class="disabled">
+            <a href="#">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        </li>
+
+        <li class="disabled">
+            <a href="#">
+                <i class="fa fa-angle-double-right"></i>
+            </a>
+        </li>
+
+    #end
+
+</div>
+<!-- End of Pagination -->

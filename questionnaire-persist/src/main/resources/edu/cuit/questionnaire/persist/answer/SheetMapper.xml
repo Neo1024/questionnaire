@@ -1,0 +1,201 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.cuit.questionnaire.persist.answer.SheetMapper">
+
+	<insert id="save" useGeneratedKeys="true" parameterType="sheet"
+			keyProperty="id">
+		INSERT INTO 
+			an_sheet (
+				questionnaire_id, 
+				user_id
+			) 
+		VALUES (
+			#{questionnaireId},
+			#{userId}
+			)
+	</insert>
+	
+	<update id="update" parameterType="sheet">
+		UPDATE
+			an_sheet
+			<set>
+				questionnaire_id = #{questionnaireId}, 
+				user_id = #{user_id}
+			</set>
+		WHERE
+			id = #{id}
+	</update>
+	
+	<delete id="deleteById" parameterType="Long">
+		DELETE 
+			an_sheet, an_answer
+        FROM	
+			an_sheet
+		LEFT OUTER JOIN
+			an_answer ON an_sheet.id = an_answer.sheet_id
+		WHERE 
+			an_sheet.id = #{sheetId}
+	</delete>
+	
+	<select id="findQuestionnaires" parameterType="Long" resultType="questionnaire">
+		SELECT 
+		    qn.*
+		FROM (	
+			SELECT
+				questionnaire_id
+			FROM
+				an_sheet
+			WHERE
+				user_id = #{userId}
+			GROUP BY
+				questionnaire_id
+			LIMIT
+				#{pageInfo.startRow}, #{pageInfo.pageSize}
+			) AS s
+		LEFT OUTER JOIN
+			qn_questionnaire qn ON qn.id = s.questionnaire_id
+	</select>
+	
+	<select id="findById" resultMap="sheetMap">
+		SELECT 
+			s.id,
+			s.questionnaire_id, 
+			s.user_id, 
+			s.create_date,
+			q.id AS questionnaireId,
+			q.title, 
+			q.description, 
+			q.create_date AS questionnaireCreateDate, 
+			q.publish, 
+			q.visible,
+			q.usages, 
+			q.user_id AS questionnaireUserId, 
+			a.id AS sheetId, 
+			a.sheet_id,
+			a.question_id, 
+			a.create_date AS answerCreateDate,
+			a.answer, 
+			a.type, 
+			qs.id AS questionId, 
+			qs.title AS questionTitle,
+			qs.create_date AS questionCreateDate,
+			qs.type AS questionType,
+			qs.questionnaire_id,
+			op.id AS optionId,
+			op.title AS optionTitle,
+			op.create_date AS optionCreateDate,
+			op.question_id
+		FROM(
+			SELECT
+				* 
+			FROM
+				an_sheet
+			WHERE
+				id = #{id}
+		) AS s
+		LEFT OUTER JOIN
+			qn_questionnaire q ON q.id = s.questionnaire_id
+		LEFT OUTER JOIN
+			an_answer a ON a.sheet_id = s.id
+		LEFT OUTER JOIN 
+			qn_question qs ON qs.id = a.question_id
+		LEFT OUTER JOIN
+			qn_option op ON op.question_id = qs.id
+
+	</select>
+	
+	<select id="findByQuestionnaireId" resultMap="sheetMap">
+		SELECT 
+			s.id,
+			s.questionnaire_id, 
+			s.user_id, 
+			s.create_date,
+			q.id AS questionnaireId,
+			q.title, 
+			q.description, 
+			q.create_date AS questionnaireCreateDate, 
+			q.publish, 
+			q.visible,
+			q.usages, 
+			q.user_id AS questionnaireUserId, 
+			a.id AS answerId, 
+			a.sheet_id,
+			a.question_id, 
+			a.create_date AS answerCreateDate,
+			a.answer, 
+			a.type, 
+			qs.id AS questionId, 
+			qs.title AS questionTitle,
+			qs.create_date AS questionCreateDate,
+			qs.type AS questionType,
+			qs.questionnaire_id,
+			op.id AS optionId,
+			op.title AS optionTitle,
+			op.create_date AS optionCreateDate,
+			op.question_id
+		FROM(
+			SELECT
+				* 
+			FROM
+				an_sheet
+			WHERE
+				questionnaire_id = #{questionnaireId}
+		) AS s
+		LEFT OUTER JOIN
+			qn_questionnaire q ON q.id = s.questionnaire_id
+		LEFT OUTER JOIN
+			an_answer a ON a.sheet_id = s.id
+		LEFT OUTER JOIN 
+			qn_question qs ON qs.id = a.question_id
+		LEFT OUTER JOIN
+			qn_option op ON op.question_id = qs.id
+	</select>
+	
+	<select id="countUserSheet" parameterType="Long" resultType="long">
+		SELECT 
+			count(*)
+		FROM
+			an_sheet
+		WHERE
+			user_id = #{userId}
+	</select>
+
+	<resultMap type="sheet" id="sheetMap">
+		<id column="id" property="id"/>
+		<result column="questionnaire_id" property="questionnaireId"/>
+		<result column="user_id" property="userId"/>
+		<result column="createDate" property="createDate"/>
+		<association property="questionnaire" javaType="questionnaire">
+			<id column="questionnaireId" property="id"/>
+			<result column="title" property="title"/>
+			<result column="description" property="description"/>
+			<result column="questionnaireCreateDate" property="createDate"/>
+			<result column="questionnairUserId" property="userId"/>
+			<result column="publish" property="publish"/>
+			<result column="visible" property="visible"/>
+			<result column="usages" property="usages"/>
+		</association>
+		<collection property="answers" ofType="answer">
+			<id column="answerId" property="id"/>
+			<result column="sheet_id" property="sheetId"/>
+			<result column="question_id" property="questionId"/>
+			<result column="answerCreateDate" property="createDate"/>
+			<result column="type" property="type"/>
+			<result column="answer" property="answer"/>
+			<association property="question" javaType="question">
+				<id column="questionId" property="id"/>
+				<result column="questionTitle" property="title"/>
+				<result column="questionCreateDate" property="createDate"/>
+				<result column="questionType" property="type"/>
+				<result column="questionnaire_id" property="questionnaireId"/>
+				<collection property="options" ofType="option">
+					<id column="optionId" property="id"/>
+					<result column="optionTitle" property="title"/>
+					<result column="optionCreateDate" property="createDate"/>
+					<result column="question_id" property="questionId"/>
+				</collection>
+			</association>
+		</collection>
+	</resultMap>
+</mapper>

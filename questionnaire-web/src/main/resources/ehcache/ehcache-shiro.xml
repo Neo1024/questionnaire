@@ -1,0 +1,10 @@
+<!-- Copyright © 2014 - 2015 BatS Technology Co., Ltd. All rights reserved. 
+	成都宝诗科技有限公司 版权所有 http://bats.im , http://ixix.im -->
+
+<ehcache updateCheck="false" name="shiroCache">
+
+	<defaultCache maxElementsInMemory="10000" eternal="false"
+		timeToIdleSeconds="120" timeToLiveSeconds="120" overflowToDisk="false"
+		diskPersistent="false" diskExpiryThreadIntervalSeconds="120" />
+
+</ehcache>

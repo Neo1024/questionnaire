@@ -1,0 +1,13 @@
+**/target/
+**/.settings/
+**/.classpath
+**/.project
+/target/
+/.settings/
+.classpath
+.project
+
+nb-configuration.xml
+**/nb-configuration.xml
+.DS_store
+**/DS_store

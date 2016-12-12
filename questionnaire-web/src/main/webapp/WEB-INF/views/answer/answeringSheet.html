@@ -1,0 +1,124 @@
+<link href="${rc.contextPath}/static/css/answer/answeringSheet.css" rel="stylesheet">
+#parse("layouts/header.html")
+#set($questionNo=0)
+
+<!-- answering sheet form -->
+
+<!-- choice-question list -->
+<form id="form-answer-sheet" method="post" action="${rc.contextPath}/answering">
+	<input name="questionnaireId" type="hidden" value="${questionnaire.id}">
+	<div class="container-fluid div-bg-green">
+		<div class="row">
+			<div class="col-sm-2 col-md-offset-1">
+				<h3>选择题</h3>
+				<br></div>
+		</div>
+		
+		<!-- question list -->
+		<div class="question-list">
+			#foreach(${question} in ${choiceQuestions})
+			<div class="div-question-content" data-id="${question.id}" 
+					data-length="${question.options.size()}" data-title="${question.title}" 
+					data-questionnaireid="${question.questionnaireId}" data-type="${question.type}">
+				<!-- question title -->
+				<input type="hidden" name="answers[${questionNo}].questionId" value=${question.id}>
+				<div class="row question-title">
+					<div class="col-sm-10 col-md-offset-2">
+						<h4>${foreach.count}. $!{question.title}</h4>
+					</div>
+				</div>
+				<!-- option list -->
+				<div class="option-list">
+				<!-- single choice question -->
+				#if(${question.type} == 0)
+				<input type="hidden" name="answers[${questionNo}].type" value=0>
+					#foreach(${option} in ${question.options})
+						#set($answerNo=$foreach.count - 1)
+						<div class="row option-item option-item-${foreach.count}" 
+								data-id="${option.id}" data-title="${option.title}">
+							<div class="col-sm-10 col-md-offset-2 option-title">
+								<input type="radio" name="answers[${questionNo}].answer" 
+									value=$answerNo required>
+								&nbsp ${option.title}
+							</div>
+						</div>
+					#end
+				#end
+				<!-- single choice question ends -->
+				
+				<!-- multiple choice question -->
+				#if(${question.type} == 1)
+				<input type="hidden" name="answers[${questionNo}].type" value=1>
+					#foreach(${option} in ${question.options})
+						#set($answerNo = $foreach.count - 1)
+						<div class="row option-item option-item-${foreach.count}" 
+								data-id="${option.id}" data-title="${option.title}">
+							<div class="col-sm-10 col-md-offset-2 option-title checkbox">&nbsp
+								<input type="checkbox" value=$answerNo class="required"
+									name="answers[${questionNo}].multipleChoices">
+								${option.title}
+							</div>
+						</div>
+					#end
+				#end
+				<!-- multiple choice question ends -->
+				</div>
+			</div>
+			#set($questionNo=$questionNo+1)
+			#end
+		</div>
+	</div>
+	
+	<!-- essay-question list -->
+	<div class="container-fluid div-bg-red">
+		<div class="row">
+			<div class="col-sm-2 col-md-offset-1">
+				<h3>问答题</h3>
+				<br></div>
+		</div>
+		
+		<!-- question list -->
+		<div class="question-list">
+			#foreach(${question} in ${essayQuestions})
+			<input type="hidden" name="answers[${questionNo}].type" value=2>
+			<input type="hidden" name="answers[${questionNo}].questionId" value=${question.id}>
+			<div class="div-question-content" data-id="${question.id}" data-title="${question.title}" 
+						data-questionnaireid="${question.questionnaireId}" data-type="${question.type}">
+				<!-- question title -->
+				<div class="row question-title">
+					<div class="col-sm-10 col-md-offset-2">
+						<h4>${foreach.count}. $!{question.title}</h4>
+						<textarea class="form-control" required
+							name="answers[$questionNo].answer"></textarea>
+					</div>
+				</div>
+			</div>
+			#set($questionNo=$questionNo+1)
+			#end
+		</div>
+		<button type="submit" class="btn btn-primary btn-lg">提交问卷</button>
+	</div>
+</form>
+<!-- answering sheet form ends -->
+
+<!-- form validation -->
+<script type="text/javascript">
+	$("#form-answer-sheet").validate();
+/* 	var questionLength = "${questionNo}";
+	$(document).ready(function() {
+		for (i = 0; i < questionLength; i++) {
+			$("#form-answer-sheet").validate({
+				rules : {
+					answers.answer : "required",
+					answers.multipleChoices : "required"
+				},
+				messages : {
+					answers.answer : "请完成该题目",
+					answers.multipleChoices : "请完成该题目"
+				}
+			});
+		}
+		
+	}); */
+</script>
+<!-- form validation ends -->

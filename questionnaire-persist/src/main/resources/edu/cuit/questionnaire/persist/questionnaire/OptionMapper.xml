@@ -1,0 +1,53 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.cuit.questionnaire.persist.questionnaire.OptionMapper">
+
+	<insert id="save" useGeneratedKeys="true" parameterType="option"
+			keyProperty="id">
+		INSERT INTO 
+			qn_option (
+				title,
+				question_id
+			) 
+		VALUES (
+			#{title},
+			#{questionId}
+			)
+	</insert>
+	
+	<update id="update" parameterType="option">
+		UPDATE
+			qn_option
+			<set>
+				title = #{title}, 
+				question_id = #{questionId}
+			</set>
+		WHERE
+			id = #{id}
+	</update>
+	
+	<delete id="deleteById" parameterType="Long">
+		DELETE FROM 
+			qn_option
+		WHERE 
+			id = #{id}
+	</delete>
+	
+	<delete id="deleteByQuestionId" parameterType="Long">
+		DELETE FROM 
+			qn_option
+		WHERE 
+			question_id = #{questionId}
+	</delete>
+	
+	<select id="findById" resultType="option">
+		SELECT
+			*
+		FROM
+			qn_option o
+		WHERE
+			o.id = #{id}
+	</select>
+
+</mapper>

@@ -1,0 +1,193 @@
+<!-- header navigation bar begins -->
+<nav class="navbar navbar-default" role="navigation">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="${rc.contextPath}/home">问卷系统</a>
+	</div>
+	<div>
+		<ul class="nav navbar-nav">
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle"
+				data-toggle="dropdown">
+					问卷 <b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu">
+					<li>
+						<a href="${rc.contextPath}/public/topQuestionnaire">热门问卷</a>
+					</li>
+					<li class="divider"></li>
+					<li>
+						<a href="${rc.contextPath}/private/myQuestionnaire">我的问卷</a>
+					</li>
+					<li class="divider"></li>
+					<li>
+						<a href="#modal-questionnaire-creation"
+						data-toggle="modal">创建问卷</a>
+					</li>
+				</ul>
+			</li>
+			<li>
+				<a href="#modal-enter-questionnaire-No" data-toggle="modal">开始答题</a>
+			</li>
+			<li>
+				<a href="${rc.contextPath}/answer/answerList" data-toggle="modal">答卷</a>
+			</li>
+<!-- 			<li class="dropdown">
+				<a href="#" class="dropdown-toggle"
+				data-toggle="dropdown">
+					问卷 <b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu">
+					<li>
+						<a href="${rc.contextPath}/public/topQuestionnaire">热门问卷</a>
+					</li>
+					<li class="divider"></li>
+					<li>
+						<a href="${rc.contextPath}/private/myQuestionnaire">我的问卷</a>
+					</li>
+					<li class="divider"></li>
+					<li>
+						<a href="#modal-questionnaire-creation"
+						data-toggle="modal">创建问卷</a>
+					</li>
+				</ul>
+			</li> -->
+			<!-- <li class="dropdown">
+				<a href="#" class="dropdown-toggle"
+				data-toggle="dropdown">
+					答卷 <b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu">
+					<li>
+						<a href="#">问卷答卷</a>
+					</li>
+				</ul>
+			</li> -->
+		</ul>
+	</div>
+	<ul class="nav pull-right">
+		<li class="dropdown">
+			<a href="#" role="button"
+			class="dropdown-toggle" data-toggle="dropdown">
+				<i
+				class="icon-user"></i>
+				$!{shiro.user.name} <i class="caret"></i>
+
+			</a>
+			<ul class="dropdown-menu">
+				<li>
+					<a tabindex="-1" href="#">账户信息</a>
+				</li>
+				<li class="divider"></li>
+				<li>
+					<a tabindex="-1" href="${rc.contextPath}/logout">退出账户</a>
+				</li>
+			</ul>
+		</li>
+	</ul>
+</nav>
+<!-- header navigation bar ends -->
+
+<!-- questionnaire creation modal  -->
+<div class="modal fade" id="modal-questionnaire-creation" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<form action="${rc.contextPath}/private/questionnaire/creation"
+				method="post" class="form-horizontal" role="form"
+				id="questionnaire-creation">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">创建问卷</h4>
+				</div>
+
+				<div class="modal-body">
+					<label class="control-label">问卷标题</label>
+					<input
+						class="form-control" type="text" name="title">
+					<br>
+					<label
+						class="control-label">问卷描述</label>
+					<input class="form-control"
+						type="text" name="description">
+					<div class="radio">
+						<label>
+							<input type="radio" name="visible"
+							id="radio-public" value="true">公开</label>
+						<label>
+							<input type="radio" name="visible"
+							id="radio-private" value="false" checked>私密</label>
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="submit" class="btn btn-primary"
+						id="btn-create-questionnaire">创建</button>
+				</div>
+			</form>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+<!-- /.modal -->
+
+<!-- enter questionnaire number modal  -->
+<div class="modal fade" id="modal-enter-questionnaire-No" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<form action="${rc.contextPath}/answering"
+				method="get" class="form-horizontal" role="form"
+				id="enter-questionnaire-No">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" id="myModalLabel">请输入问卷编号</h4>
+				</div>
+
+				<div class="modal-body">
+					<label class="control-label">请输入问卷编号</label>
+					<input
+						class="form-control" type="text" name="questionnaireId">
+					<br>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="submit" class="btn btn-primary"
+						id="btn-enter-questionnaire-No">答题</button>
+				</div>
+			</form>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+<!-- /.modal -->
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#questionnaire-creation").validate({
+			rules : {
+				title : "required",
+				description : "required"
+			},
+			messages : {
+				title : "请输入问卷标题",
+				description : "请输入问卷描述"
+			}
+		});
+		
+		$("enter-questionnaire-No").validate({
+			rules : {
+				questionnaireId : "required",
+				questionnaireId : "number"
+			},
+			messages : {
+				questionnaireId : "请输入正确问卷编号!"
+			}
+		});
+	});
+</script>
